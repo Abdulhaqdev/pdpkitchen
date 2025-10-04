@@ -18,9 +18,9 @@ export default function SignInViewPage() {
       const response = await fetch(`${BASE_URL}login/`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(credentials),
+        body: JSON.stringify(credentials)
       });
 
       if (!response.ok) {
@@ -35,11 +35,10 @@ export default function SignInViewPage() {
       document.cookie = `access_token=${data.access}; path=/`;
       document.cookie = `refresh_token=${data.refresh}; path=/`;
       router.push('/dashboard'); // Yoki kerakli sahifaga o'tkazish
- 
     },
     onError: (err) => {
-      setError(err instanceof Error ? err.message : 'Noma\'lum xatolik');
-    },
+      setError(err instanceof Error ? err.message : "Noma'lum xatolik");
+    }
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -50,13 +49,13 @@ export default function SignInViewPage() {
 
   return (
     <div className='relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0'>
-      <div className='bg-muted relative  h-full lg:flex dark:border-r flex items-center justify-center'>
+      <div className='bg-muted relative flex h-full items-center justify-center lg:flex dark:border-r'>
         <Image
-        width={300}
-        height={300}
-          src='/pdpu.jpg'
+          width={300}
+          height={300}
+          src='/pdp.jpg'
           alt='Login background'
-          className='relative z-10 h-80 w-80 object-cover rounded-full shadow-xl'
+          className='relative z-10 h-80 w-80 rounded-full object-cover shadow-xl'
         />
       </div>
       <div className='flex h-full items-center justify-center p-4 lg:p-8'>
@@ -73,8 +72,8 @@ export default function SignInViewPage() {
                   type='text'
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className='w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
-                  placeholder="Foydalanuvchi nomingizni kiriting"
+                  className='border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50'
+                  placeholder='Foydalanuvchi nomingizni kiriting'
                   required
                   disabled={mutation.isPending}
                 />
@@ -88,29 +87,24 @@ export default function SignInViewPage() {
                   type='password'
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className='w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
-                  placeholder="Parolingizni kiriting"
+                  className='border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50'
+                  placeholder='Parolingizni kiriting'
                   required
                   disabled={mutation.isPending}
                 />
               </div>
-              {error && (
-                <p className='text-sm text-destructive'>{error}</p>
-              )}
+              {error && <p className='text-destructive text-sm'>{error}</p>}
               <button
                 type='submit'
                 disabled={mutation.isPending}
-                className='w-full rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+                className='bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring w-full rounded-md px-3 py-2 text-sm font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50'
               >
                 {mutation.isPending ? 'Kutmoqda...' : 'Kirish'}
               </button>
             </form>
           </div>
-
-         
         </div>
       </div>
     </div>
   );
 }
-
