@@ -1,6 +1,5 @@
 import { NavItem } from '@/types';
 
-
 //Info: The following data is used for the sidebar navigation and Cmd K bar.
 export const navItems: NavItem[] = [
   {
@@ -19,10 +18,15 @@ export const navItems: NavItem[] = [
     isActive: false,
     items: [] // No child items
   },
+  {
+    title: 'No Eating',
+    url: '/dashboard/no-eating',
+    icon: 'employee',
+    shortcut: ['n', 'n'],
+    isActive: false,
+    items: [] // No child items
+  }
 ];
-
-
-
 
 // constants/data.ts - Add Student type
 export interface Student {
@@ -37,9 +41,9 @@ export interface Student {
   until_date: string;
   is_active: boolean;
   image: string;
-  description: string,
-  basis_document_number: string | null,
-  basis_document_file: string | null
+  description: string;
+  basis_document_number: string | null;
+  basis_document_file: string | null;
 }
 
 // @/types/student.ts (updated)

@@ -3,7 +3,7 @@
 import {
   Collapsible,
   CollapsibleContent,
-  CollapsibleTrigger,
+  CollapsibleTrigger
 } from '@/components/ui/collapsible';
 import {
   DropdownMenu,
@@ -11,7 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import {
   Sidebar,
@@ -26,7 +26,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarRail,
+  SidebarRail
 } from '@/components/ui/sidebar';
 import { navItems } from '@/constants/data';
 import { useMediaQuery } from '@/hooks/use-media-query';
@@ -34,7 +34,7 @@ import {
   IconChevronRight,
   IconChevronsDown,
   IconLogout,
-  IconPhotoUp,
+  IconPhotoUp
 } from '@tabler/icons-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -44,10 +44,8 @@ import { Icons } from '../icons';
 export const company = {
   name: 'Acme Inc',
   logo: IconPhotoUp,
-  plan: 'Enterprise',
+  plan: 'Enterprise'
 };
-
-
 
 export default function AppSidebar() {
   const pathname = usePathname();
@@ -69,14 +67,15 @@ export default function AppSidebar() {
     // Ensure this logic doesn't affect SSR
   }, [isOpen]);
 
-
   return (
     <Sidebar collapsible='icon'>
       <SidebarHeader>
-        <div className='flex items-center space-x-2 px-4 py-3 text-2xl font-bold'>
-          PDP Kitchen
-        </div>     
-       </SidebarHeader>
+        <SidebarGroupLabel>
+          <div className='flex items-center space-x-2 px-4 py-3 text-2xl font-bold'>
+            PDP Kitchen
+          </div>
+        </SidebarGroupLabel>
+      </SidebarHeader>
       <SidebarContent className='overflow-x-hidden'>
         <SidebarGroup>
           <SidebarGroupLabel>Overview</SidebarGroupLabel>
@@ -146,7 +145,7 @@ export default function AppSidebar() {
                   size='lg'
                   className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
                 >
-                  admin  <IconChevronsDown className='ml-auto size-4' />
+                  admin <IconChevronsDown className='ml-auto size-4' />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -156,9 +155,7 @@ export default function AppSidebar() {
                 sideOffset={4}
               >
                 <DropdownMenuLabel className='p-0 font-normal'>
-                  <div className='px-1 py-1.5'>
-                    PDP Kitchen
-                  </div>
+                  <div className='px-1 py-1.5'>PDP Kitchen</div>
                 </DropdownMenuLabel>
 
                 <DropdownMenuSeparator />
