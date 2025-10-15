@@ -2,17 +2,21 @@ import type { NextConfig } from 'next';
 import { withSentryConfig } from '@sentry/nextjs';
 
 // Define the base Next.js configuration
-const baseConfig = {
+const baseConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
         protocol: 'http',
+        hostname: '**'
+      },
+      {
+        protocol: 'http',
         hostname: '10.20.0.152',
         port: '8000',
-        pathname: '/media/student_images/**'
+        pathname: '/media/student_images/**' // Optional: Restrict to this path for security
       }
     ],
-    unoptimized: false
+    unoptimized: true
   },
   eslint: {
     ignoreDuringBuilds: true
