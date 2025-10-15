@@ -4,10 +4,10 @@ import {
   useMutation,
   UseQueryOptions,
   UseMutationOptions,
-  useQueryClient,
+  useQueryClient
 } from '@tanstack/react-query';
 
-const BASE_URL = 'https://pdpkitchen.diyarbek.uz/api/';
+const BASE_URL = 'http://10.20.0.152:8000/api/';
 
 const getAccessToken = () => localStorage.getItem('access_token');
 
@@ -18,7 +18,7 @@ const refreshToken = async () => {
   const response = await fetch(`${BASE_URL}/token/refresh/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ refresh }),
+    body: JSON.stringify({ refresh })
   });
 
   if (!response.ok) throw new Error('Token yangilashda xatolik');
@@ -39,7 +39,7 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
     const headers: HeadersInit = {
       ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
       ...(token && { Authorization: `Bearer ${token}` }),
-      ...options.headers,
+      ...options.headers
     };
 
     // Agar FormData bo‘lsa Content-Type avtomatik qo‘yilsin
@@ -49,7 +49,7 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
 
     const response = await fetch(`${BASE_URL}${endpoint}`, {
       ...options,
-      headers,
+      headers
     });
 
     if (response.status === 401 && retries < maxRetries - 1) {
@@ -85,7 +85,7 @@ export const useApiQuery = <TData, TError = Error>(
   return useQuery<TData, TError>({
     queryKey: [endpoint],
     queryFn: () => apiRequest(endpoint, { method: 'GET' }),
-    ...options,
+    ...options
   });
 };
 
@@ -106,13 +106,13 @@ export const useApiMutation = <
       } else if (variables) {
         return apiRequest(endpoint, {
           method,
-          body: JSON.stringify(variables),
+          body: JSON.stringify(variables)
         });
       } else {
         return apiRequest(endpoint, { method });
       }
     },
-    ...options,
+    ...options
   });
 };
 
@@ -128,6 +128,6 @@ export const useDeleteStudent = <TError = Error>(
     ...(options as UseMutationOptions<void, TError, void | FormData>),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['students'] });
-    },
+    }
   });
 };

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
 import Image from 'next/image';
 
-const BASE_URL = 'https://pdpkitchen.diyarbek.uz/api/';
+const BASE_URL = 'http://10.20.0.152:8000/api/';
 
 export default function SignInViewPage() {
   const [username, setUsername] = useState('');
