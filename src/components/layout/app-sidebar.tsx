@@ -33,12 +33,15 @@ import {
   IconChevronRight,
   IconChevronsDown,
   IconLogout,
-  IconPhotoUp
+  IconPhotoUp,
+  IconUser
 } from '@tabler/icons-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
 import { Icons } from '../icons';
+import { useUser } from '@/hooks/use-user';
+import { Badge } from '@/components/ui/badge';
 
 export const company = {
   name: 'Acme Inc',
@@ -50,6 +53,7 @@ export default function AppSidebar() {
   const pathname = usePathname();
   const { isOpen } = useMediaQuery(); // This will only run on client
   const router = useRouter();
+  const { data: user } = useUser();
 
   // Handle logout
   const handleLogout = () => {
@@ -163,7 +167,30 @@ export default function AppSidebar() {
                   size='lg'
                   className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
                 >
-                  admin <IconChevronsDown className='ml-auto size-4' />
+                  <div className='flex items-center gap-2'>
+                    <div className='bg-primary/10 flex h-8 w-8 items-center justify-center rounded-full'>
+                      <IconUser className='text-primary h-4 w-4' />
+                    </div>
+                    <div className='flex flex-col items-start text-sm'>
+                      <span className='font-medium'>
+                        {user?.username || 'Foydalanuvchi'}
+                      </span>
+                      {user?.is_superuser && (
+                        <Badge
+                          variant='secondary'
+                          className='px-1 py-0 text-xs'
+                        >
+                          Admin
+                        </Badge>
+                      )}
+                      {user?.is_staff && !user?.is_superuser && (
+                        <Badge variant='outline' className='px-1 py-0 text-xs'>
+                          Xodim
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                  <IconChevronsDown className='ml-auto size-4' />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -173,13 +200,21 @@ export default function AppSidebar() {
                 sideOffset={4}
               >
                 <DropdownMenuLabel className='p-0 font-normal'>
-                  <div className='px-1 py-1.5'>PDP Kitchen</div>
+                  <div className='px-2 py-2'>
+                    <p className='font-medium'>
+                      {user?.first_name || user?.username || 'Foydalanuvchi'}
+                      {user?.last_name && ` ${user.last_name}`}
+                    </p>
+                    <p className='text-muted-foreground text-xs'>
+                      @{user?.username || 'user'}
+                    </p>
+                  </div>
                 </DropdownMenuLabel>
 
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
                   <IconLogout className='mr-2 h-4 w-4' />
-                  Logout
+                  Chiqish
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

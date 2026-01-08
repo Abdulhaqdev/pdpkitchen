@@ -1,0 +1,2883 @@
+openapi: 3.0.3
+info:
+  title: PDP Kitchen Management API
+  version: 1.0.0
+  description: API documentation for PDP Kitchen Management System
+paths:
+  /api/dashboard/dashboard/:
+    get:
+      operationId: dashboard_dashboard_retrieve
+      description: 'Returns all statistics in a single response: students, meals,
+        orders, complaints'
+      summary: Get consolidated dashboard statistics
+      tags:
+      - Dashboard
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardResponse'
+          description: ''
+  /api/export/export-to-excel/:
+    get:
+      operationId: export_export_to_excel_retrieve
+      description: Export with lazy pandas import
+      summary: Export to Excel
+      tags:
+      - Meals
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          description: Excel file download
+  /api/login/:
+    post:
+      operationId: login_create
+      description: Log in with username and password to get access and refresh tokens
+      summary: Log in and get JWT tokens
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+              examples:
+                SuccessfulLogin:
+                  value:
+                    access: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
+                    refresh: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
+                  summary: Example of a successful login response
+                  description: Response containing access and refresh tokens
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                InvalidCredentials:
+                  value:
+                    detail: Invalid credentials
+                  summary: Example of an invalid credentials response
+                  description: Response indicating invalid username or password
+          description: ''
+  /api/meal-orders/complaints/:
+    get:
+      operationId: meal_orders_complaints_list
+      description: Staff can view all complaints with filtering options
+      summary: List all complaints
+      parameters:
+      - in: query
+        name: course
+        schema:
+          type: integer
+        description: Filter by course
+      - in: query
+        name: meal_type
+        schema:
+          type: string
+        description: Filter by meal type
+      - in: query
+        name: pinfl
+        schema:
+          type: string
+        description: Filter by student PINFL
+      - in: query
+        name: status
+        schema:
+          type: string
+        description: Filter by status (PENDING, REVIEWED, RESOLVED, REJECTED)
+      - in: query
+        name: student_type
+        schema:
+          type: string
+        description: Filter by student type
+      tags:
+      - Complaints
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ComplaintRead'
+          description: ''
+  /api/meal-orders/complaints/{id}/:
+    get:
+      operationId: meal_orders_complaints_retrieve
+      description: Staff can view complaint details
+      summary: Retrieve a complaint
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this complaint model.
+        required: true
+      tags:
+      - Complaints
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintRead'
+          description: ''
+  /api/meal-orders/complaints/{id}/update-status/:
+    patch:
+      operationId: meal_orders_complaints_update_status_partial_update
+      description: Staff can update complaint status and add admin response
+      summary: Update complaint status
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this complaint model.
+        required: true
+      tags:
+      - Complaints
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedComplaintUpdateStatusRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedComplaintUpdateStatusRequest'
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/PatchedComplaintUpdateStatusRequest'
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintRead'
+          description: ''
+  /api/meal-orders/complaints/statistics/:
+    get:
+      operationId: meal_orders_complaints_statistics_retrieve
+      description: Get statistics about complaints by status
+      summary: Get complaint statistics
+      tags:
+      - Complaints
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintStatistics'
+          description: ''
+  /api/meal-orders/menu/:
+    get:
+      operationId: meal_orders_menu_list
+      description: Get all menus ordered by date descending
+      summary: List all menus
+      tags:
+      - Weekly Menu
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WeeklyMenu'
+          description: ''
+    post:
+      operationId: meal_orders_menu_create
+      description: Create a new menu for a specific date
+      summary: Create menu for a date
+      tags:
+      - Weekly Menu
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WeeklyMenuCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WeeklyMenuCreateRequest'
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/WeeklyMenuCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeeklyMenuCreate'
+          description: ''
+  /api/meal-orders/menu/{menu_date}/:
+    get:
+      operationId: meal_orders_menu_retrieve
+      description: Retrieve menu for a specific date (YYYY-MM-DD)
+      summary: Get menu by date
+      parameters:
+      - in: path
+        name: menu_date
+        schema:
+          type: string
+          pattern: ^\d{4}-\d{2}-\d{2}$
+        required: true
+      tags:
+      - Weekly Menu
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeeklyMenu'
+          description: ''
+    put:
+      operationId: meal_orders_menu_update
+      description: Update all fields of a menu
+      summary: Update menu
+      parameters:
+      - in: path
+        name: menu_date
+        schema:
+          type: string
+          pattern: ^\d{4}-\d{2}-\d{2}$
+        required: true
+      tags:
+      - Weekly Menu
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WeeklyMenuCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WeeklyMenuCreateRequest'
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/WeeklyMenuCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeeklyMenuCreate'
+          description: ''
+    patch:
+      operationId: meal_orders_menu_partial_update
+      description: Update specific fields of a menu
+      summary: Partial update menu
+      parameters:
+      - in: path
+        name: menu_date
+        schema:
+          type: string
+          pattern: ^\d{4}-\d{2}-\d{2}$
+        required: true
+      tags:
+      - Weekly Menu
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedWeeklyMenuCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedWeeklyMenuCreateRequest'
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/PatchedWeeklyMenuCreateRequest'
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeeklyMenuCreate'
+          description: ''
+    delete:
+      operationId: meal_orders_menu_destroy
+      description: Delete a menu for a specific date
+      summary: Delete menu
+      parameters:
+      - in: path
+        name: menu_date
+        schema:
+          type: string
+          pattern: ^\d{4}-\d{2}-\d{2}$
+        required: true
+      tags:
+      - Weekly Menu
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/meal-orders/menu/next-week/:
+    get:
+      operationId: meal_orders_menu_next_week_retrieve
+      description: Get menu for the next week (Monday to Sunday)
+      summary: Get next week's menu
+      tags:
+      - Weekly Menu
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeekMenuResponse'
+          description: ''
+  /api/meal-orders/menu/week/:
+    get:
+      operationId: meal_orders_menu_week_retrieve
+      description: Get menu for the current week (Monday to Sunday)
+      summary: Get current week's menu
+      tags:
+      - Weekly Menu
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeekMenuResponse'
+          description: ''
+  /api/meal-orders/orders/by-date/:
+    get:
+      operationId: meal_orders_orders_by_date_retrieve
+      description: |-
+        Get meal orders for a specific date with statistics.
+
+        Query Parameters:
+        - date: Date in YYYY-MM-DD format (required)
+        - meal_type: Filter by meal type (BREAKFAST, LUNCH, DINNER)
+        - student_type: Filter by student type (SCHOLARSHIP, CONTRACT)
+        - course: Filter by course number
+      summary: Get orders by date
+      parameters:
+      - in: query
+        name: course
+        schema:
+          type: integer
+        description: Filter by course
+      - in: query
+        name: date
+        schema:
+          type: string
+        description: Date (YYYY-MM-DD)
+        required: true
+      - in: query
+        name: meal_type
+        schema:
+          type: string
+        description: Filter by meal type
+      - in: query
+        name: student_type
+        schema:
+          type: string
+        description: Filter by student type
+      tags:
+      - Meal Orders
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderStatistics'
+          description: ''
+  /api/meal-orders/orders/pending-meals/:
+    get:
+      operationId: meal_orders_orders_pending_meals_retrieve
+      description: |-
+        Get list of students who placed meal orders but have not received their meals yet.
+
+        Query Parameters:
+        - date: Date in YYYY-MM-DD format (required)
+        - meal_type: Filter by meal type (BREAKFAST, LUNCH, DINNER) (optional)
+        - student_type: Filter by student type (SCHOLARSHIP, CONTRACT)
+        - course: Filter by course number
+      summary: Get students with pending meals
+      parameters:
+      - in: query
+        name: course
+        schema:
+          type: integer
+        description: Filter by course
+      - in: query
+        name: date
+        schema:
+          type: string
+        description: Date (YYYY-MM-DD)
+        required: true
+      - in: query
+        name: meal_type
+        schema:
+          type: string
+        description: BREAKFAST, LUNCH, or DINNER
+      - in: query
+        name: student_type
+        schema:
+          type: string
+        description: Filter by student type
+      tags:
+      - Meal Orders
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingMealsResponse'
+          description: ''
+  /api/meal-orders/orders/students-who-ordered/:
+    get:
+      operationId: meal_orders_orders_students_who_ordered_retrieve
+      description: |-
+        Get detailed list of students who ordered meals for a specific date and meal type.
+
+        Query Parameters:
+        - date: Date in YYYY-MM-DD format (required)
+        - meal_type: Meal type to filter (BREAKFAST, LUNCH, DINNER) (required)
+        - student_type: Filter by student type (SCHOLARSHIP, CONTRACT)
+        - course: Filter by course number
+      summary: Get students who ordered
+      parameters:
+      - in: query
+        name: course
+        schema:
+          type: integer
+        description: Filter by course
+      - in: query
+        name: date
+        schema:
+          type: string
+        description: Date (YYYY-MM-DD)
+        required: true
+      - in: query
+        name: meal_type
+        schema:
+          type: string
+        description: BREAKFAST, LUNCH, or DINNER
+        required: true
+      - in: query
+        name: student_type
+        schema:
+          type: string
+        description: Filter by student type
+      tags:
+      - Meal Orders
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentsWhoOrderedResponse'
+          description: ''
+  /api/meals/:
+    get:
+      operationId: meals_list
+      description: List meal logs - cached for 30 seconds
+      summary: List all meal logs
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - Meals
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMealLogListList'
+          description: ''
+    post:
+      operationId: meals_create
+      description: Create meal log - invalidate cache
+      summary: Create a new meal log
+      tags:
+      - Meals
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MealLogRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MealLogRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MealLog'
+          description: ''
+  /api/meals/{id}/:
+    get:
+      operationId: meals_retrieve
+      description: Optimized ViewSet for meal logs
+      summary: Retrieve a meal log
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this meals log model.
+        required: true
+      tags:
+      - Meals
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MealLog'
+          description: ''
+    put:
+      operationId: meals_update
+      description: Optimized ViewSet for meal logs
+      summary: Update a meal log
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this meals log model.
+        required: true
+      tags:
+      - Meals
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MealLogRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MealLogRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MealLog'
+          description: ''
+    patch:
+      operationId: meals_partial_update
+      description: Optimized ViewSet for meal logs
+      summary: Partially update a meal log
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this meals log model.
+        required: true
+      tags:
+      - Meals
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedMealLogRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedMealLogRequest'
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MealLog'
+          description: ''
+    delete:
+      operationId: meals_destroy
+      description: Optimized ViewSet for meal logs
+      summary: Delete a meal log
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this meals log model.
+        required: true
+      tags:
+      - Meals
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/meals/by-date/:
+    get:
+      operationId: meals_by_date_retrieve
+      description: Optimized meals by date query
+      summary: Get meals by date with filtering
+      parameters:
+      - in: query
+        name: date
+        schema:
+          type: string
+        description: Date (YYYY-MM-DD)
+      - in: query
+        name: meal_type
+        schema:
+          type: string
+        description: Filter by meal type (BREAKFAST, LUNCH, DINNER)
+      - in: query
+        name: pinfl
+        schema:
+          type: string
+        description: Filter by student PINFL
+      tags:
+      - Meals
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MealsByDateResponse'
+          description: ''
+  /api/meals/log-by-face/:
+    post:
+      operationId: meals_log_by_face_create
+      description: Optimized face recognition meal logging
+      summary: Log meal by face recognition
+      tags:
+      - Meals
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FaceMealLogRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FaceMealLogRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FaceMealLogResponse'
+          description: ''
+        '400':
+          description: Bad request
+        '404':
+          description: No matching student
+        '409':
+          description: Already logged
+  /api/search-students/:
+    get:
+      operationId: search_students_list
+      description: Search students by first name, last name, middle name (partial)
+        or PINFL (exact match).
+      summary: Search students
+      parameters:
+      - in: query
+        name: first_name
+        schema:
+          type: string
+        description: Partial match on first name
+      - in: query
+        name: last_name
+        schema:
+          type: string
+        description: Partial match on last name
+      - in: query
+        name: middle_name
+        schema:
+          type: string
+        description: Partial match on middle name
+      - in: query
+        name: pinfl
+        schema:
+          type: string
+        description: Exact match on PINFL
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Students
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StudentList'
+          description: ''
+  /api/search-students/{id}/:
+    get:
+      operationId: search_students_retrieve
+      description: |-
+        ViewSet for searching students by first name, last name, middle name, or PINFL.
+        Accessible by staff and superusers only.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this students model.
+        required: true
+      tags:
+      - search-students
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentList'
+          description: ''
+  /api/self/:
+    get:
+      operationId: self_retrieve
+      description: Retrieve the profile information of the currently authenticated
+        user
+      summary: Get authenticated user's profile
+      tags:
+      - User
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Self'
+          description: ''
+  /api/stats/by-range/:
+    get:
+      operationId: stats_by_range_retrieve
+      description: |-
+        Get detailed meal statistics for a custom date range with filtering.
+
+        Query Parameters:
+        - start_date: Start date in YYYY-MM-DD format (required)
+        - end_date: End date in YYYY-MM-DD format (default: today)
+        - meal_type: Filter by meal type (BREAKFAST, LUNCH, DINNER)
+        - student_type: Filter by student type (SCHOLARSHIP, CONTRACT)
+        - course: Filter by course number
+      summary: Get statistics by date range
+      parameters:
+      - in: query
+        name: course
+        schema:
+          type: integer
+        description: Filter by course number
+      - in: query
+        name: end_date
+        schema:
+          type: string
+        description: 'End date (default: today)'
+      - in: query
+        name: meal_type
+        schema:
+          type: string
+        description: Filter by meal type
+      - in: query
+        name: start_date
+        schema:
+          type: string
+        description: Start date (YYYY-MM-DD)
+        required: true
+      - in: query
+        name: student_type
+        schema:
+          type: string
+        description: Filter by student type
+      tags:
+      - Meal Statistics
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DateRangeResponse'
+          description: ''
+  /api/stats/student-history/:
+    get:
+      operationId: stats_student_history_retrieve
+      description: |-
+        Get detailed meal history for a specific student.
+
+        Query Parameters:
+        - pinfl: Student PINFL (required)
+        - start_date: Filter from date (YYYY-MM-DD)
+        - end_date: Filter to date (YYYY-MM-DD)
+      summary: Get student meal history
+      parameters:
+      - in: query
+        name: end_date
+        schema:
+          type: string
+        description: End date (YYYY-MM-DD)
+      - in: query
+        name: pinfl
+        schema:
+          type: string
+        description: Student PINFL
+        required: true
+      - in: query
+        name: start_date
+        schema:
+          type: string
+        description: Start date (YYYY-MM-DD)
+      tags:
+      - Meal Statistics
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentHistoryResponse'
+          description: ''
+  /api/stats/students-not-eating/:
+    get:
+      operationId: stats_students_not_eating_retrieve
+      description: |-
+        Get list of active enrolled students who are NOT eating meals.
+
+        This helps identify:
+        - Students who never logged any meal
+        - Students who haven't eaten in specified number of days
+
+        Query Parameters:
+        - days: Consider students who haven't eaten in last X days (default: 7)
+        - course: Filter by course number
+        - student_type: Filter by student type (SCHOLARSHIP, CONTRACT)
+        - limit: Maximum number of students to return (default: 50, max: 500)
+      summary: Get students who are not eating
+      parameters:
+      - in: query
+        name: course
+        schema:
+          type: integer
+        description: Filter by course
+      - in: query
+        name: days
+        schema:
+          type: integer
+        description: 'Days of inactivity (default: 7)'
+      - in: query
+        name: limit
+        schema:
+          type: integer
+        description: 'Max students (default: 50)'
+      - in: query
+        name: student_type
+        schema:
+          type: string
+        description: Filter by student type
+      tags:
+      - Meal Statistics
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentsNotEatingResponse'
+          description: ''
+  /api/student-data-collection/:
+    post:
+      operationId: student_data_collection_create
+      description: Endpoint for collecting student data along with an image for face
+        embedding generation.
+      summary: Collect student data with image
+      tags:
+      - Students
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StudentDataCollectionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StudentDataCollectionRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentDataCollection'
+          description: ''
+  /api/students/:
+    get:
+      operationId: students_list
+      description: Staff can view list of students with search and filter options
+      summary: List all students
+      parameters:
+      - in: query
+        name: has_face_embedding
+        schema:
+          type: boolean
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+        description: Filter by active status
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: pinfl
+        schema:
+          type: string
+        description: Filter by exact PINFL
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Search by first name, last name, or PINFL
+      tags:
+      - Students
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedStudentListList'
+          description: ''
+    post:
+      operationId: students_create
+      description: |-
+        ViewSet for managing students with automatic face embedding generation
+        - Staff can list and retrieve students (read-only)
+        - Superuser can perform all CRUD operations
+        - Face embeddings are automatically generated from uploaded images
+        - Supports search by name and PINFL
+        - Supports filtering by active status and other fields
+      tags:
+      - students
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StudentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StudentRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+          description: ''
+  /api/students/{id}/:
+    get:
+      operationId: students_retrieve
+      description: Staff can view student details
+      summary: Retrieve a student
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this students model.
+        required: true
+      tags:
+      - Students
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentList'
+          description: ''
+    put:
+      operationId: students_update
+      description: |-
+        ViewSet for managing students with automatic face embedding generation
+        - Staff can list and retrieve students (read-only)
+        - Superuser can perform all CRUD operations
+        - Face embeddings are automatically generated from uploaded images
+        - Supports search by name and PINFL
+        - Supports filtering by active status and other fields
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this students model.
+        required: true
+      tags:
+      - students
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StudentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StudentRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+          description: ''
+    patch:
+      operationId: students_partial_update
+      description: |-
+        ViewSet for managing students with automatic face embedding generation
+        - Staff can list and retrieve students (read-only)
+        - Superuser can perform all CRUD operations
+        - Face embeddings are automatically generated from uploaded images
+        - Supports search by name and PINFL
+        - Supports filtering by active status and other fields
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this students model.
+        required: true
+      tags:
+      - students
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedStudentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedStudentRequest'
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+          description: ''
+    delete:
+      operationId: students_destroy
+      description: |-
+        ViewSet for managing students with automatic face embedding generation
+        - Staff can list and retrieve students (read-only)
+        - Superuser can perform all CRUD operations
+        - Face embeddings are automatically generated from uploaded images
+        - Supports search by name and PINFL
+        - Supports filtering by active status and other fields
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this students model.
+        required: true
+      tags:
+      - students
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/students/{id}/food-history/:
+    get:
+      operationId: students_food_history_retrieve
+      description: Retrieve the food consumption history for a specific student by
+        their ID.
+      summary: Get food history for a student
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this students model.
+        required: true
+      tags:
+      - Students
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+          description: ''
+  /api/students/face-db-stats/:
+    get:
+      operationId: students_face_db_stats_retrieve
+      description: Get information about the in-memory face database
+      summary: Get face database statistics
+      tags:
+      - Students
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+          description: ''
+  /api/token/refresh/:
+    post:
+      operationId: token_refresh_create
+      description: Refresh the JWT access token using a valid refresh token from the
+        request body
+      summary: Refresh JWT access token
+      tags:
+      - User
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefreshResponse'
+              examples:
+                SuccessfulTokenRefresh:
+                  value:
+                    access: new_access_token_string
+                  summary: Example of a successful token refresh response
+                  description: Response containing a new access token
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                NoRefreshToken:
+                  value:
+                    error: No refresh token provided
+                  summary: Example of a missing refresh token response
+                  description: Response indicating no refresh token was provided
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                InvalidRefreshToken:
+                  value:
+                    error: Invalid refresh token
+                  summary: Example of an invalid refresh token response
+                  description: Response indicating the provided refresh token is invalid
+          description: ''
+  /api/update-image/via-hemis-id/:
+    post:
+      operationId: update_image_via_hemis_id_create
+      description: Update a student's image using their HEMIS ID and regenerate face
+        embedding.
+      summary: Update student image via HEMIS ID
+      tags:
+      - Students
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UpdateImageViaHemisIdRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UpdateImageViaHemisIdRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateImageViaHemisId'
+          description: ''
+components:
+  schemas:
+    ComplaintRead:
+      type: object
+      description: Serializer for reading complaints (RESPONSE only)
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student:
+          allOf:
+          - $ref: '#/components/schemas/StudentBasic'
+          readOnly: true
+        meal_log:
+          type: integer
+          readOnly: true
+          description: Shikoyat qilinayotgan ovqat yozuvi
+        meal_type:
+          type: string
+          readOnly: true
+        meal_type_display:
+          type: string
+          readOnly: true
+        meal_date:
+          type: string
+          format: date-time
+          readOnly: true
+        complaint_text:
+          type: string
+          readOnly: true
+        image:
+          type: string
+          format: uri
+          readOnly: true
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          readOnly: true
+        status_display:
+          type: string
+          readOnly: true
+        admin_response:
+          type: string
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - admin_response
+      - complaint_text
+      - created_at
+      - id
+      - image
+      - meal_date
+      - meal_log
+      - meal_type
+      - meal_type_display
+      - status
+      - status_display
+      - student
+      - updated_at
+    ComplaintStatistics:
+      type: object
+      description: Response for complaint statistics endpoint
+      properties:
+        total_complaints:
+          type: integer
+        by_status:
+          $ref: '#/components/schemas/StatusBreakdown'
+        by_meal_type:
+          $ref: '#/components/schemas/MealTypeBreakdown'
+      required:
+      - by_meal_type
+      - by_status
+      - total_complaints
+    ComplaintStats:
+      type: object
+      description: Complaint statistics by status
+      properties:
+        pending:
+          type: integer
+        reviewed:
+          type: integer
+        resolved:
+          type: integer
+        rejected:
+          type: integer
+      required:
+      - pending
+      - rejected
+      - resolved
+      - reviewed
+    CountsByType:
+      type: object
+      description: Meal counts by type
+      properties:
+        breakfast:
+          type: integer
+        lunch:
+          type: integer
+        dinner:
+          type: integer
+      required:
+      - breakfast
+      - dinner
+      - lunch
+    DailyBreakdown:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        total:
+          type: integer
+        breakfast:
+          type: integer
+        lunch:
+          type: integer
+        dinner:
+          type: integer
+      required:
+      - breakfast
+      - date
+      - dinner
+      - lunch
+      - total
+    DashboardResponse:
+      type: object
+      description: Main dashboard response serializer
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        students:
+          $ref: '#/components/schemas/StudentStats'
+        meals:
+          $ref: '#/components/schemas/MealStats'
+        orders:
+          $ref: '#/components/schemas/OrderStats'
+        complaints:
+          $ref: '#/components/schemas/ComplaintStats'
+      required:
+      - complaints
+      - meals
+      - orders
+      - students
+      - timestamp
+    DateRangeInfo:
+      type: object
+      properties:
+        start:
+          type: string
+          format: date
+        end:
+          type: string
+          format: date
+        days:
+          type: integer
+      required:
+      - days
+      - end
+      - start
+    DateRangeResponse:
+      type: object
+      properties:
+        date_range:
+          $ref: '#/components/schemas/DateRangeInfo'
+        filters_applied:
+          type: object
+          additionalProperties: {}
+        summary:
+          $ref: '#/components/schemas/DateRangeSummary'
+        daily_breakdown:
+          type: array
+          items:
+            $ref: '#/components/schemas/DailyBreakdown'
+      required:
+      - daily_breakdown
+      - date_range
+      - filters_applied
+      - summary
+    DateRangeSummary:
+      type: object
+      properties:
+        total_meals:
+          type: integer
+        unique_students:
+          type: integer
+        by_meal_type:
+          $ref: '#/components/schemas/MealTypeBreakdown'
+        average_meals_per_day:
+          type: number
+          format: double
+        average_meals_per_student:
+          type: number
+          format: double
+          description: Average meals per student who ate during this period
+      required:
+      - average_meals_per_day
+      - average_meals_per_student
+      - by_meal_type
+      - total_meals
+      - unique_students
+    ErrorResponse:
+      type: object
+      description: Serializer for error responses
+      properties:
+        detail:
+          type: string
+          description: Error detail message
+        error:
+          type: string
+          description: Error message
+    FaceMealLogRequest:
+      type: object
+      description: Serializer for logging meals via face recognition
+      properties:
+        image:
+          type: string
+          format: binary
+          description: Upload a face image
+        meal_type:
+          allOf:
+          - $ref: '#/components/schemas/MealTypeEnum'
+          description: |-
+            Type of meal (BREAKFAST, LUNCH, DINNER)
+
+            * `BREAKFAST` - Breakfast
+            * `LUNCH` - Lunch
+            * `DINNER` - Dinner
+      required:
+      - image
+      - meal_type
+    FaceMealLogResponse:
+      type: object
+      description: Response serializer for face-based meal logging
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        meal_log:
+          $ref: '#/components/schemas/MealLog'
+        student:
+          $ref: '#/components/schemas/StudentDetail'
+        similarity_score:
+          type: number
+          format: double
+        existing_log:
+          allOf:
+          - $ref: '#/components/schemas/MealLog'
+          description: Existing meal log if duplicate
+      required:
+      - message
+      - success
+    Filters:
+      type: object
+      description: Applied filters
+      properties:
+        meal_type:
+          type: array
+          items:
+            type: string
+          nullable: true
+        pinfl:
+          type: string
+          nullable: true
+    InactiveStudent:
+      type: object
+      properties:
+        id:
+          type: integer
+        pinfl:
+          type: string
+        name:
+          type: string
+        course:
+          type: integer
+        student_type:
+          $ref: '#/components/schemas/StudentTypeEnum'
+        enrollment_date:
+          type: string
+          format: date
+        until_date:
+          type: string
+          format: date
+        days_since_last_meal:
+          type: integer
+          nullable: true
+          description: Days since last meal, null if never ate
+        last_meal_date:
+          type: string
+          format: date-time
+          nullable: true
+        total_meals:
+          type: integer
+          description: Total meals in their entire history
+      required:
+      - course
+      - days_since_last_meal
+      - enrollment_date
+      - id
+      - last_meal_date
+      - name
+      - pinfl
+      - student_type
+      - total_meals
+      - until_date
+    LoginRequest:
+      type: object
+      description: Serializer for user login
+      properties:
+        username:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - password
+      - username
+    MealLog:
+      type: object
+      description: Serializer for meal logs - staff can view history
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student_details:
+          allOf:
+          - $ref: '#/components/schemas/StudentList'
+          readOnly: true
+        meal_date:
+          type: string
+          format: date-time
+          readOnly: true
+        meal_type:
+          $ref: '#/components/schemas/MealTypeEnum'
+        student:
+          type: integer
+      required:
+      - id
+      - meal_date
+      - student
+      - student_details
+    MealLogList:
+      type: object
+      description: |-
+        Optimized serializer for listing meal logs - excludes nested student details
+        Uses direct field access to avoid N+1 queries
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student:
+          type: integer
+          readOnly: true
+        pinfl:
+          type: string
+          readOnly: true
+        first_name:
+          type: string
+          readOnly: true
+        last_name:
+          type: string
+          readOnly: true
+        student_name:
+          type: string
+          readOnly: true
+        meal_type:
+          allOf:
+          - $ref: '#/components/schemas/MealTypeEnum'
+          readOnly: true
+        meal_date:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - first_name
+      - id
+      - last_name
+      - meal_date
+      - meal_type
+      - pinfl
+      - student
+      - student_name
+    MealLogRequest:
+      type: object
+      description: Serializer for meal logs - staff can view history
+      properties:
+        meal_type:
+          $ref: '#/components/schemas/MealTypeEnum'
+        student:
+          type: integer
+      required:
+      - student
+    MealLogWithStudent:
+      type: object
+      description: Serializer for meal logs with full student details
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student:
+          allOf:
+          - $ref: '#/components/schemas/StudentDetail'
+          readOnly: true
+        meal_type:
+          allOf:
+          - $ref: '#/components/schemas/MealTypeEnum'
+          readOnly: true
+        meal_type_display:
+          type: string
+          readOnly: true
+        meal_date:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - id
+      - meal_date
+      - meal_type
+      - meal_type_display
+      - student
+    MealOrderWithStudent:
+      type: object
+      description: Meal order with student details
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student:
+          allOf:
+          - $ref: '#/components/schemas/StudentBasic'
+          readOnly: true
+        order_date:
+          type: string
+          format: date
+          readOnly: true
+        breakfast_ordered:
+          type: boolean
+          readOnly: true
+        lunch_ordered:
+          type: boolean
+          readOnly: true
+        dinner_ordered:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - breakfast_ordered
+      - created_at
+      - dinner_ordered
+      - id
+      - lunch_ordered
+      - order_date
+      - student
+    MealStats:
+      type: object
+      description: Meal statistics for different periods
+      properties:
+        today:
+          $ref: '#/components/schemas/MealTypeBreakdown'
+        this_week:
+          $ref: '#/components/schemas/MealTypeBreakdown'
+        this_month:
+          $ref: '#/components/schemas/MealTypeBreakdown'
+      required:
+      - this_month
+      - this_week
+      - today
+    MealTypeBreakdown:
+      type: object
+      description: Meal type breakdown
+      properties:
+        total:
+          type: integer
+        breakfast:
+          type: integer
+        lunch:
+          type: integer
+        dinner:
+          type: integer
+      required:
+      - breakfast
+      - dinner
+      - lunch
+      - total
+    MealTypeEnum:
+      enum:
+      - BREAKFAST
+      - LUNCH
+      - DINNER
+      type: string
+      description: |-
+        * `BREAKFAST` - Breakfast
+        * `LUNCH` - Lunch
+        * `DINNER` - Dinner
+    MealsByDateResponse:
+      type: object
+      description: Response for meals by date endpoint
+      properties:
+        date:
+          type: string
+          format: date
+        total_count:
+          type: integer
+        counts_by_type:
+          $ref: '#/components/schemas/CountsByType'
+        filters:
+          $ref: '#/components/schemas/Filters'
+        meals:
+          type: array
+          items:
+            $ref: '#/components/schemas/MealLogWithStudent'
+      required:
+      - counts_by_type
+      - date
+      - filters
+      - meals
+      - total_count
+    OrderStatistics:
+      type: object
+      description: Statistics for a specific date
+      properties:
+        date:
+          type: string
+          format: date
+        total_students_ordered:
+          type: integer
+        breakfast_count:
+          type: integer
+        lunch_count:
+          type: integer
+        dinner_count:
+          type: integer
+        orders:
+          type: array
+          items:
+            $ref: '#/components/schemas/MealOrderWithStudent'
+      required:
+      - breakfast_count
+      - date
+      - dinner_count
+      - lunch_count
+      - orders
+      - total_students_ordered
+    OrderStats:
+      type: object
+      description: Order statistics for tomorrow
+      properties:
+        date:
+          type: string
+          format: date
+        total_orders:
+          type: integer
+        breakfast_count:
+          type: integer
+        lunch_count:
+          type: integer
+        dinner_count:
+          type: integer
+      required:
+      - breakfast_count
+      - date
+      - dinner_count
+      - lunch_count
+      - total_orders
+    OrderedMeals:
+      type: object
+      description: Ordered meals breakdown
+      properties:
+        breakfast:
+          type: boolean
+        lunch:
+          type: boolean
+        dinner:
+          type: boolean
+      required:
+      - breakfast
+      - dinner
+      - lunch
+    PaginatedMealLogListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/MealLogList'
+    PaginatedStudentListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/StudentList'
+    PatchedComplaintUpdateStatusRequest:
+      type: object
+      description: Serializer for updating complaint status
+      properties:
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          description: |-
+            Shikoyat holati
+
+            * `PENDING` - Kutilmoqda
+            * `REVIEWED` - Ko'rib chiqildi
+            * `RESOLVED` - Hal qilindi
+            * `REJECTED` - Rad etildi
+        admin_response:
+          type: string
+          description: Administrator javobi (ixtiyoriy)
+    PatchedMealLogRequest:
+      type: object
+      description: Serializer for meal logs - staff can view history
+      properties:
+        meal_type:
+          $ref: '#/components/schemas/MealTypeEnum'
+        student:
+          type: integer
+    PatchedStudentRequest:
+      type: object
+      description: Serializer for student model - automatically generates face embedding
+        from image
+      properties:
+        pinfl:
+          type: string
+          minLength: 1
+          maxLength: 50
+        hemis_id:
+          type: string
+          nullable: true
+          maxLength: 50
+        first_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        last_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        middle_name:
+          type: string
+          nullable: true
+          maxLength: 100
+        student_type:
+          $ref: '#/components/schemas/StudentTypeEnum'
+        course:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        until_date:
+          type: string
+          format: date
+        is_active:
+          type: boolean
+        image:
+          type: string
+          format: binary
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        basis_document_number:
+          type: string
+          nullable: true
+          maxLength: 100
+        basis_document_file:
+          type: string
+          format: binary
+          nullable: true
+    PatchedWeeklyMenuCreateRequest:
+      type: object
+      description: Serializer for creating/updating menu
+      properties:
+        menu_date:
+          type: string
+          format: date
+          description: Menyu sanasi
+        breakfast_dish:
+          type: string
+          nullable: true
+          description: 'Nonushta taomi nomi (masalan: Osh, Manti)'
+          maxLength: 200
+        lunch_dish:
+          type: string
+          nullable: true
+          description: Tushlik taomi nomi
+          maxLength: 200
+        dinner_dish:
+          type: string
+          nullable: true
+          description: Kechki ovqat taomi nomi
+          maxLength: 200
+    PendingMealItem:
+      type: object
+      description: Single pending meal item
+      properties:
+        order_id:
+          type: integer
+        student:
+          $ref: '#/components/schemas/StudentDetailInOrder'
+        order_date:
+          type: string
+          format: date
+        ordered_meals:
+          $ref: '#/components/schemas/OrderedMeals'
+        pending_meal_types:
+          type: array
+          items:
+            type: string
+        ordered_at:
+          type: string
+          format: date-time
+      required:
+      - order_date
+      - order_id
+      - ordered_at
+      - ordered_meals
+      - pending_meal_types
+      - student
+    PendingMealsResponse:
+      type: object
+      description: Response for pending_meals endpoint
+      properties:
+        date:
+          type: string
+          format: date
+        total_pending:
+          type: integer
+        filters_applied:
+          type: object
+          additionalProperties: {}
+        pending_meals:
+          type: array
+          items:
+            $ref: '#/components/schemas/PendingMealItem'
+      required:
+      - date
+      - filters_applied
+      - pending_meals
+      - total_pending
+    RecentMeal:
+      type: object
+      properties:
+        id:
+          type: integer
+        meal_type:
+          $ref: '#/components/schemas/MealTypeEnum'
+        date:
+          type: string
+          format: date-time
+      required:
+      - date
+      - id
+      - meal_type
+    Self:
+      type: object
+      description: Serializer for the authenticated user's own profile
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          readOnly: true
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        is_active:
+          type: boolean
+          readOnly: true
+          title: Active
+          description: Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
+        is_staff:
+          type: boolean
+          readOnly: true
+          title: Staff status
+          description: Designates whether the user can log into this admin site.
+        is_superuser:
+          type: boolean
+          readOnly: true
+          title: Superuser status
+          description: Designates that this user has all permissions without explicitly
+            assigning them.
+      required:
+      - id
+      - is_active
+      - is_staff
+      - is_superuser
+      - username
+    StatusBreakdown:
+      type: object
+      description: Complaint status breakdown
+      properties:
+        pending:
+          type: integer
+        reviewed:
+          type: integer
+        resolved:
+          type: integer
+        rejected:
+          type: integer
+      required:
+      - pending
+      - rejected
+      - resolved
+      - reviewed
+    StatusEnum:
+      enum:
+      - PENDING
+      - REVIEWED
+      - RESOLVED
+      - REJECTED
+      type: string
+      description: |-
+        * `PENDING` - Kutilmoqda
+        * `REVIEWED` - Ko'rib chiqildi
+        * `RESOLVED` - Hal qilindi
+        * `REJECTED` - Rad etildi
+    Student:
+      type: object
+      description: Serializer for student model - automatically generates face embedding
+        from image
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        pinfl:
+          type: string
+          maxLength: 50
+        hemis_id:
+          type: string
+          nullable: true
+          maxLength: 50
+        first_name:
+          type: string
+          maxLength: 100
+        last_name:
+          type: string
+          maxLength: 100
+        middle_name:
+          type: string
+          nullable: true
+          maxLength: 100
+        student_type:
+          $ref: '#/components/schemas/StudentTypeEnum'
+        course:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        enrollment_date:
+          type: string
+          format: date
+          readOnly: true
+        until_date:
+          type: string
+          format: date
+        is_active:
+          type: boolean
+        image:
+          type: string
+          format: uri
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        basis_document_number:
+          type: string
+          nullable: true
+          maxLength: 100
+        basis_document_file:
+          type: string
+          format: uri
+          nullable: true
+      required:
+      - course
+      - enrollment_date
+      - first_name
+      - id
+      - last_name
+      - pinfl
+      - until_date
+    StudentBasic:
+      type: object
+      description: Basic student info for order lists
+      properties:
+        id:
+          type: integer
+        pinfl:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        course:
+          type: integer
+        student_type:
+          type: string
+      required:
+      - course
+      - first_name
+      - id
+      - last_name
+      - pinfl
+      - student_type
+    StudentDataCollection:
+      type: object
+      description: |-
+        Serializer for collecting student data from external systems
+        Note: Image is required for this endpoint as it's specifically for data collection
+      properties:
+        pinfl:
+          type: string
+          maxLength: 14
+        image:
+          type: string
+          format: uri
+      required:
+      - image
+      - pinfl
+    StudentDataCollectionRequest:
+      type: object
+      description: |-
+        Serializer for collecting student data from external systems
+        Note: Image is required for this endpoint as it's specifically for data collection
+      properties:
+        pinfl:
+          type: string
+          minLength: 1
+          maxLength: 14
+        image:
+          type: string
+          format: binary
+      required:
+      - image
+      - pinfl
+    StudentDetail:
+      type: object
+      description: Detailed student serializer for meal logs
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        pinfl:
+          type: string
+          maxLength: 50
+        first_name:
+          type: string
+          maxLength: 100
+        last_name:
+          type: string
+          maxLength: 100
+        middle_name:
+          type: string
+          nullable: true
+          maxLength: 100
+        full_name:
+          type: string
+          description: Get full name of student
+          readOnly: true
+        student_type:
+          $ref: '#/components/schemas/StudentTypeEnum'
+        course:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        enrollment_date:
+          type: string
+          format: date
+          readOnly: true
+        until_date:
+          type: string
+          format: date
+        is_active:
+          type: boolean
+        image_url:
+          type: string
+          format: uri
+          description: Get image URL
+          readOnly: true
+        description:
+          type: string
+          nullable: true
+      required:
+      - course
+      - enrollment_date
+      - first_name
+      - full_name
+      - id
+      - image_url
+      - last_name
+      - pinfl
+      - until_date
+    StudentDetailInOrder:
+      type: object
+      description: Student info in order responses
+      properties:
+        id:
+          type: integer
+        pinfl:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        full_name:
+          type: string
+        course:
+          type: integer
+        student_type:
+          type: string
+      required:
+      - course
+      - first_name
+      - id
+      - last_name
+      - pinfl
+      - student_type
+    StudentDetailedInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+        pinfl:
+          type: string
+        name:
+          type: string
+        course:
+          type: integer
+        student_type:
+          $ref: '#/components/schemas/StudentTypeEnum'
+        is_active:
+          type: boolean
+        enrollment_date:
+          type: string
+          format: date
+        until_date:
+          type: string
+          format: date
+      required:
+      - course
+      - enrollment_date
+      - id
+      - is_active
+      - name
+      - pinfl
+      - student_type
+      - until_date
+    StudentHistoryResponse:
+      type: object
+      properties:
+        student:
+          $ref: '#/components/schemas/StudentDetailedInfo'
+        statistics:
+          $ref: '#/components/schemas/StudentHistoryStats'
+        recent_meals:
+          type: array
+          items:
+            $ref: '#/components/schemas/RecentMeal'
+      required:
+      - recent_meals
+      - statistics
+      - student
+    StudentHistoryStats:
+      type: object
+      properties:
+        total_meals:
+          type: integer
+        by_meal_type:
+          $ref: '#/components/schemas/MealTypeBreakdown'
+        first_meal:
+          type: string
+          format: date-time
+          nullable: true
+        last_meal:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - by_meal_type
+      - first_meal
+      - last_meal
+      - total_meals
+    StudentList:
+      type: object
+      description: Serializer for listing students - excludes face_embedding for performance
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        pinfl:
+          type: string
+          readOnly: true
+        hemis_id:
+          type: string
+          readOnly: true
+          nullable: true
+        first_name:
+          type: string
+          readOnly: true
+        last_name:
+          type: string
+          readOnly: true
+        middle_name:
+          type: string
+          readOnly: true
+          nullable: true
+        student_type:
+          allOf:
+          - $ref: '#/components/schemas/StudentTypeEnum'
+          readOnly: true
+        course:
+          type: integer
+          readOnly: true
+        enrollment_date:
+          type: string
+          format: date
+          readOnly: true
+        until_date:
+          type: string
+          format: date
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+        image:
+          type: string
+          format: uri
+          readOnly: true
+          nullable: true
+        description:
+          type: string
+          readOnly: true
+          nullable: true
+        basis_document_number:
+          type: string
+          readOnly: true
+          nullable: true
+        basis_document_file:
+          type: string
+          format: uri
+          readOnly: true
+          nullable: true
+      required:
+      - basis_document_file
+      - basis_document_number
+      - course
+      - description
+      - enrollment_date
+      - first_name
+      - hemis_id
+      - id
+      - image
+      - is_active
+      - last_name
+      - middle_name
+      - pinfl
+      - student_type
+      - until_date
+    StudentRequest:
+      type: object
+      description: Serializer for student model - automatically generates face embedding
+        from image
+      properties:
+        pinfl:
+          type: string
+          minLength: 1
+          maxLength: 50
+        hemis_id:
+          type: string
+          nullable: true
+          maxLength: 50
+        first_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        last_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        middle_name:
+          type: string
+          nullable: true
+          maxLength: 100
+        student_type:
+          $ref: '#/components/schemas/StudentTypeEnum'
+        course:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        until_date:
+          type: string
+          format: date
+        is_active:
+          type: boolean
+        image:
+          type: string
+          format: binary
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        basis_document_number:
+          type: string
+          nullable: true
+          maxLength: 100
+        basis_document_file:
+          type: string
+          format: binary
+          nullable: true
+      required:
+      - course
+      - first_name
+      - last_name
+      - pinfl
+      - until_date
+    StudentStats:
+      type: object
+      description: Student statistics
+      properties:
+        total_active:
+          type: integer
+        with_face_embedding:
+          type: integer
+        by_type:
+          $ref: '#/components/schemas/StudentTypeBreakdown'
+      required:
+      - by_type
+      - total_active
+      - with_face_embedding
+    StudentTypeBreakdown:
+      type: object
+      description: Student type breakdown (scholarship vs contract)
+      properties:
+        scholarship:
+          type: integer
+        contract:
+          type: integer
+      required:
+      - contract
+      - scholarship
+    StudentTypeEnum:
+      enum:
+      - SCHOLARSHIP
+      - CONTRACT
+      type: string
+      description: |-
+        * `SCHOLARSHIP` - Grant
+        * `CONTRACT` - Kontrakt
+    StudentWhoOrderedItem:
+      type: object
+      description: Single student who ordered
+      properties:
+        order_id:
+          type: integer
+        student:
+          $ref: '#/components/schemas/StudentDetailInOrder'
+        order_date:
+          type: string
+          format: date
+        ordered_at:
+          type: string
+          format: date-time
+      required:
+      - order_date
+      - order_id
+      - ordered_at
+      - student
+    StudentsNotEatingResponse:
+      type: object
+      properties:
+        total_active_students:
+          type: integer
+          description: Total students enrolled and active
+        students_never_ate:
+          type: integer
+          description: Students who never logged a meal
+        students_inactive_days:
+          type: integer
+          description: Students who haven't eaten in specified days
+        filters:
+          type: object
+          additionalProperties: {}
+        students:
+          type: array
+          items:
+            $ref: '#/components/schemas/InactiveStudent'
+      required:
+      - filters
+      - students
+      - students_inactive_days
+      - students_never_ate
+      - total_active_students
+    StudentsWhoOrderedResponse:
+      type: object
+      description: Response for students_who_ordered endpoint
+      properties:
+        date:
+          type: string
+          format: date
+        meal_type:
+          type: string
+        total_count:
+          type: integer
+        filters_applied:
+          type: object
+          additionalProperties: {}
+        students:
+          type: array
+          items:
+            $ref: '#/components/schemas/StudentWhoOrderedItem'
+      required:
+      - date
+      - filters_applied
+      - meal_type
+      - students
+      - total_count
+    TokenRefreshResponse:
+      type: object
+      description: Serializer for successful token refresh response
+      properties:
+        access:
+          type: string
+          description: New JWT access token
+      required:
+      - access
+    TokenResponse:
+      type: object
+      description: Serializer for successful login response
+      properties:
+        access:
+          type: string
+          description: JWT access token
+        refresh:
+          type: string
+          description: JWT refresh token
+      required:
+      - access
+      - refresh
+    UpdateImageViaHemisId:
+      type: object
+      description: Serializer for updating student image via Hemis ID
+      properties:
+        hemis_id:
+          type: string
+          maxLength: 50
+        image:
+          type: string
+          format: uri
+      required:
+      - hemis_id
+      - image
+    UpdateImageViaHemisIdRequest:
+      type: object
+      description: Serializer for updating student image via Hemis ID
+      properties:
+        hemis_id:
+          type: string
+          minLength: 1
+          maxLength: 50
+        image:
+          type: string
+          format: binary
+      required:
+      - hemis_id
+      - image
+    WeekMenuResponse:
+      type: object
+      description: Response for week menu endpoint
+      properties:
+        week_start:
+          type: string
+          format: date
+        week_end:
+          type: string
+          format: date
+        menus:
+          type: array
+          items:
+            $ref: '#/components/schemas/WeeklyMenu'
+      required:
+      - menus
+      - week_end
+      - week_start
+    WeeklyMenu:
+      type: object
+      description: Serializer for weekly menu CRUD
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        menu_date:
+          type: string
+          format: date
+          description: Menyu sanasi
+        day_of_week:
+          type: string
+          readOnly: true
+        breakfast_dish:
+          type: string
+          nullable: true
+          description: 'Nonushta taomi nomi (masalan: Osh, Manti)'
+          maxLength: 200
+        lunch_dish:
+          type: string
+          nullable: true
+          description: Tushlik taomi nomi
+          maxLength: 200
+        dinner_dish:
+          type: string
+          nullable: true
+          description: Kechki ovqat taomi nomi
+          maxLength: 200
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        created_by:
+          type: string
+          readOnly: true
+          nullable: true
+      required:
+      - created_at
+      - created_by
+      - day_of_week
+      - id
+      - menu_date
+      - updated_at
+    WeeklyMenuCreate:
+      type: object
+      description: Serializer for creating/updating menu
+      properties:
+        menu_date:
+          type: string
+          format: date
+          description: Menyu sanasi
+        breakfast_dish:
+          type: string
+          nullable: true
+          description: 'Nonushta taomi nomi (masalan: Osh, Manti)'
+          maxLength: 200
+        lunch_dish:
+          type: string
+          nullable: true
+          description: Tushlik taomi nomi
+          maxLength: 200
+        dinner_dish:
+          type: string
+          nullable: true
+          description: Kechki ovqat taomi nomi
+          maxLength: 200
+      required:
+      - menu_date
+    WeeklyMenuCreateRequest:
+      type: object
+      description: Serializer for creating/updating menu
+      properties:
+        menu_date:
+          type: string
+          format: date
+          description: Menyu sanasi
+        breakfast_dish:
+          type: string
+          nullable: true
+          description: 'Nonushta taomi nomi (masalan: Osh, Manti)'
+          maxLength: 200
+        lunch_dish:
+          type: string
+          nullable: true
+          description: Tushlik taomi nomi
+          maxLength: 200
+        dinner_dish:
+          type: string
+          nullable: true
+          description: Kechki ovqat taomi nomi
+          maxLength: 200
+      required:
+      - menu_date
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

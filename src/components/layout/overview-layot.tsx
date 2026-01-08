@@ -9,7 +9,15 @@ import {
   CardFooter,
   CardContent
 } from '@/components/ui/card';
-import { IconTrendingDown, IconTrendingUp } from '@tabler/icons-react';
+import {
+  IconTrendingDown,
+  IconTrendingUp,
+  IconUsers,
+  IconUserScan,
+  IconToolsKitchen2,
+  IconClipboardList,
+  IconMessageReport
+} from '@tabler/icons-react';
 import React from 'react';
 import {
   Table,
@@ -21,6 +29,7 @@ import {
   TableCell
 } from '@/components/ui/table';
 import { format, subDays } from 'date-fns';
+import { DashboardResponse } from '@/types/dashboard';
 
 type RangeOverviewData = {
   date_range: {
@@ -56,6 +65,7 @@ interface OverViewLayoutProps {
   bar_stats: React.ReactNode;
   area_stats: React.ReactNode;
   stats?: RangeOverviewData | null;
+  dashboardData?: DashboardResponse | null;
 }
 
 export default function OverViewLayout({
@@ -63,7 +73,8 @@ export default function OverViewLayout({
   pie_stats,
   bar_stats,
   area_stats,
-  stats
+  stats,
+  dashboardData
 }: OverViewLayoutProps) {
   const getChangeIcon = (change: number) =>
     change >= 0 ? <IconTrendingUp /> : <IconTrendingDown />;
@@ -103,10 +114,104 @@ export default function OverViewLayout({
           <h2 className='text-2xl font-bold tracking-tight'>
             Salom, xush kelibsiz 👋
           </h2>
-          <div className='text-muted-foreground text-sm'>
-            Filtrlar: Kurs {filters.course}, Talaba turi: {filters.student_type}
-            , {dateRange.start} - {dateRange.end} ({dateRange.days} kun)
+        </div>
+
+        {/* Quick Stats from Consolidated Dashboard API */}
+        {dashboardData && (
+          <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-5'>
+            <Card>
+              <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                <CardDescription>Faol Talabalar</CardDescription>
+                <IconUsers className='text-muted-foreground h-4 w-4' />
+              </CardHeader>
+              <CardContent>
+                <div className='text-2xl font-bold'>
+                  {dashboardData.students.total_active.toLocaleString()}
+                </div>
+                <p className='text-muted-foreground text-xs'>
+                  Grant: {dashboardData.students.by_type.scholarship} |
+                  Kontrakt: {dashboardData.students.by_type.contract}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                <CardDescription>Yuz bilan</CardDescription>
+                <IconUserScan className='text-muted-foreground h-4 w-4' />
+              </CardHeader>
+              <CardContent>
+                <div className='text-2xl font-bold'>
+                  {dashboardData.students.with_face_embedding.toLocaleString()}
+                </div>
+                <p className='text-muted-foreground text-xs'>
+                  {dashboardData.students.total_active > 0
+                    ? Math.round(
+                        (dashboardData.students.with_face_embedding /
+                          dashboardData.students.total_active) *
+                          100
+                      )
+                    : 0}
+                  % talabalar
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                <CardDescription>Bugungi Ovqatlar</CardDescription>
+                <IconToolsKitchen2 className='text-muted-foreground h-4 w-4' />
+              </CardHeader>
+              <CardContent>
+                <div className='text-2xl font-bold'>
+                  {dashboardData.meals.today.total.toLocaleString()}
+                </div>
+                <p className='text-muted-foreground text-xs'>
+                  N: {dashboardData.meals.today.breakfast} | T:{' '}
+                  {dashboardData.meals.today.lunch} | K:{' '}
+                  {dashboardData.meals.today.dinner}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                <CardDescription>Ertangi Buyurtmalar</CardDescription>
+                <IconClipboardList className='text-muted-foreground h-4 w-4' />
+              </CardHeader>
+              <CardContent>
+                <div className='text-2xl font-bold'>
+                  {dashboardData.orders.total_orders.toLocaleString()}
+                </div>
+                <p className='text-muted-foreground text-xs'>
+                  N: {dashboardData.orders.breakfast_count} | T:{' '}
+                  {dashboardData.orders.lunch_count} | K:{' '}
+                  {dashboardData.orders.dinner_count}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                <CardDescription>Kutilayotgan Shikoyatlar</CardDescription>
+                <IconMessageReport className='text-muted-foreground h-4 w-4' />
+              </CardHeader>
+              <CardContent>
+                <div className='text-2xl font-bold'>
+                  {dashboardData.complaints.pending}
+                </div>
+                <p className='text-muted-foreground text-xs'>
+                  Ko'rilgan: {dashboardData.complaints.reviewed} | Hal:{' '}
+                  {dashboardData.complaints.resolved}
+                </p>
+              </CardContent>
+            </Card>
           </div>
+        )}
+
+        <div className='text-muted-foreground text-sm'>
+          Filtrlar: Kurs {filters.course}, Talaba turi: {filters.student_type},{' '}
+          {dateRange.start} - {dateRange.end} ({dateRange.days} kun)
         </div>
 
         <div className='space-y-4'>

@@ -7,6 +7,7 @@ import { FormInput } from '@/components/forms/form-input';
 import { FormSelect, type FormOption } from '@/components/forms/form-select';
 import { CardSkeleton } from '@/components/card-skeletion';
 import { format, subDays } from 'date-fns';
+import { DashboardResponse } from '@/types/dashboard';
 
 type RangeOverviewData = {
   date_range: {
@@ -76,6 +77,11 @@ export default function OverviewPage() {
     error
   } = useApiQuery<RangeOverviewData>(`stats/by-range/?${queryParams}`);
 
+  // Consolidated dashboard data
+  const { data: dashboardData } = useApiQuery<DashboardResponse>(
+    'dashboard/dashboard/'
+  );
+
   const onSubmit = (data: FormData) => {
     console.log('Form submitted with:', data);
   };
@@ -143,6 +149,7 @@ export default function OverviewPage() {
           bar_stats={null}
           area_stats={null}
           stats={stats}
+          dashboardData={dashboardData}
         />
       </Suspense>
     </div>

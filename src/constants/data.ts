@@ -19,6 +19,18 @@ export const navItems: NavItem[] = [
     items: []
   },
   {
+    title: 'Menyu',
+    url: '/dashboard/menu',
+    icon: 'menu',
+    shortcut: ['m', 'e'],
+    isActive: false,
+    items: [
+      { title: "Ro'yxat", url: '/dashboard/menu' },
+      { title: 'Shu hafta', url: '/dashboard/menu/week' },
+      { title: 'Keyingi hafta', url: '/dashboard/menu/next-week' }
+    ]
+  },
+  {
     title: 'Ovqatlanish',
     url: '/dashboard/meals',
     icon: 'meals',
