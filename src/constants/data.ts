@@ -8,58 +8,58 @@ export const navItems: NavItem[] = [
     icon: 'dashboard',
     isActive: false,
     shortcut: ['d', 'd'],
-    items: [] // Empty array as there are no child items for Dashboard
+    items: []
   },
   {
-    title: 'Students',
+    title: 'Talabalar',
     url: '/dashboard/student',
     icon: 'user2',
-    shortcut: ['p', 'p'],
+    shortcut: ['s', 's'],
     isActive: false,
-    items: [] // No child items
+    items: []
   },
   {
-    title: 'No Eating',
+    title: 'Ovqatlanish',
+    url: '/dashboard/meals',
+    icon: 'meals',
+    shortcut: ['m', 'm'],
+    isActive: false,
+    items: [
+      { title: "Ro'yxat", url: '/dashboard/meals' },
+      { title: "Sana bo'yicha", url: '/dashboard/meals/by-date' },
+      { title: 'Statistika', url: '/dashboard/meals/statistics' },
+      { title: 'Yuz orqali', url: '/dashboard/meals/log-by-face' }
+    ]
+  },
+  {
+    title: 'Shikoyatlar',
+    url: '/dashboard/complaints',
+    icon: 'complaints',
+    shortcut: ['c', 'c'],
+    isActive: false,
+    items: [
+      { title: "Ro'yxat", url: '/dashboard/complaints' },
+      { title: 'Statistika', url: '/dashboard/complaints/statistics' }
+    ]
+  },
+  {
+    title: 'Buyurtmalar',
+    url: '/dashboard/orders/by-date',
+    icon: 'orders',
+    shortcut: ['o', 'o'],
+    isActive: false,
+    items: [
+      { title: "Sana bo'yicha", url: '/dashboard/orders/by-date' },
+      { title: 'Ovqatlanmaganlar', url: '/dashboard/orders/pending' },
+      { title: 'Buyurtma berganlar', url: '/dashboard/orders/students-ordered' }
+    ]
+  },
+  {
+    title: 'Ovqatlanmaganlar',
     url: '/dashboard/no-eating',
     icon: 'employee',
     shortcut: ['n', 'n'],
     isActive: false,
-    items: [] // No child items
+    items: []
   }
 ];
-
-// constants/data.ts - Add Student type
-export interface Student {
-  id: number;
-  pinfl: string;
-  first_name: string;
-  last_name: string;
-  middle_name: string;
-  student_type: string;
-  course: number;
-  enrollment_date: string;
-  until_date: string;
-  is_active: boolean;
-  image: string;
-  description: string;
-  basis_document_number: string | null;
-  basis_document_file: string | null;
-}
-
-// @/types/student.ts (updated)
-export interface Studentpost {
-  id: number;
-  pinfl: string;
-  first_name: string;
-  last_name: string;
-  middle_name?: string;
-  student_type: 'SCHOLARSHIP' | 'CONTRACT';
-  course: number;
-  enrollment_date: string;
-  until_date: string;
-  is_active: boolean;
-  image?: string;
-  description?: string;
-  base_document_file?: string;
-  basis_document_number?: string;
-}

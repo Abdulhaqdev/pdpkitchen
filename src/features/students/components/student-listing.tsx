@@ -1,0 +1,52 @@
+'use client';
+
+import { useQueryState, parseAsInteger, parseAsString } from 'nuqs';
+import { useApiQuery } from '@/lib/api'; // Assuming the API hooks are in '@/lib/api'
+import { Student } from '@/types/students';
+import { PaginatedResponse } from '@/types/api';
+import { columns } from './student-tables/columns';
+import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
+import { StudentTable } from './student-tables';
+
+type PaginatedStudents = PaginatedResponse<Student>;
+
+type StudentListingPage = {};
+
+export default function StudentListingPage({}: StudentListingPage) {
+  const [page] = useQueryState('page', parseAsInteger.withDefault(1));
+  const [perPage] = useQueryState('perPage', parseAsInteger.withDefault(10));
+  const [search] = useQueryState('search', parseAsString.withDefault(''));
+
+  const params = new URLSearchParams({
+    page: page.toString(),
+    page_size: perPage.toString(),
+    ...(search && { search })
+  }).toString();
+
+  const endpoint = `students/?${params}`;
+
+  const { data, isPending, error } = useApiQuery<PaginatedStudents>(endpoint);
+
+  if (isPending) {
+    return <DataTableSkeleton columnCount={8} rowCount={8} filterCount={1} />;
+  }
+
+  if (error) {
+    return (
+      <div className='flex h-24 items-center justify-center text-center'>
+        Xatolik yuklashda: {error.message}
+      </div>
+    );
+  }
+
+  const students: Student[] = data?.results || [];
+  const totalStudents = data?.count || 0;
+
+  return (
+    <StudentTable
+      data={students}
+      totalItems={totalStudents}
+      columns={columns}
+    />
+  );
+}

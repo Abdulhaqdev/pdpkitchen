@@ -20,6 +20,7 @@ import {
   TableRow,
   TableCell
 } from '@/components/ui/table';
+import { format, subDays } from 'date-fns';
 
 type RangeOverviewData = {
   date_range: {
@@ -83,9 +84,9 @@ export default function OverViewLayout({
     course: 2
   };
   const dateRange = stats?.date_range || {
-    start: '2025-10-02',
-    end: '2025-10-05',
-    days: 4
+    start: format(subDays(new Date(), 7), 'yyyy-MM-dd'),
+    end: format(new Date(), 'yyyy-MM-dd'),
+    days: 7
   };
 
   // Calculate changes (comparing last day with previous day)

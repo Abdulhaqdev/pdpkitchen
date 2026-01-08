@@ -25,8 +25,7 @@ import {
   SidebarMenuItem,
   SidebarMenuSub,
   SidebarMenuSubButton,
-  SidebarMenuSubItem,
-  SidebarRail
+  SidebarMenuSubItem
 } from '@/components/ui/sidebar';
 import { navItems } from '@/constants/data';
 import { useMediaQuery } from '@/hooks/use-media-query';
@@ -68,7 +67,7 @@ export default function AppSidebar() {
   }, [isOpen]);
 
   return (
-    <Sidebar collapsible='icon'>
+    <Sidebar collapsible='none'>
       <SidebarHeader>
         <SidebarGroupLabel>
           <div className='flex items-center space-x-2 px-4 py-3 text-2xl font-bold'>
@@ -82,24 +81,43 @@ export default function AppSidebar() {
           <SidebarMenu>
             {navItems.map((item) => {
               const Icon = item.icon ? Icons[item.icon] : Icons.logo;
+              // Check if current path matches this item or any of its sub-items
+              const isActiveSection =
+                pathname === item.url ||
+                pathname.startsWith(item.url) ||
+                item.items?.some(
+                  (subItem) =>
+                    pathname === subItem.url || pathname.startsWith(subItem.url)
+                );
+
               return item?.items && item?.items?.length > 0 ? (
                 <Collapsible
                   key={item.title}
                   asChild
-                  defaultOpen={item.isActive}
+                  defaultOpen={isActiveSection}
                   className='group/collapsible'
                 >
                   <SidebarMenuItem>
-                    <CollapsibleTrigger asChild>
+                    <div className='flex items-center'>
                       <SidebarMenuButton
+                        asChild
                         tooltip={item.title}
-                        isActive={pathname === item.url}
+                        isActive={
+                          pathname === item.url || pathname.startsWith(item.url)
+                        }
+                        className='flex-1'
                       >
-                        {item.icon && <Icon />}
-                        <span>{item.title}</span>
-                        <IconChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+                        <Link href={item.url}>
+                          {item.icon && <Icon />}
+                          <span>{item.title}</span>
+                        </Link>
                       </SidebarMenuButton>
-                    </CollapsibleTrigger>
+                      <CollapsibleTrigger asChild>
+                        <button className='hover:bg-sidebar-accent rounded-md p-2'>
+                          <IconChevronRight className='size-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+                        </button>
+                      </CollapsibleTrigger>
+                    </div>
                     <CollapsibleContent>
                       <SidebarMenuSub>
                         {item.items?.map((subItem) => (
@@ -168,7 +186,6 @@ export default function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
-      <SidebarRail />
     </Sidebar>
   );
 }

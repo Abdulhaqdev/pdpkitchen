@@ -80,7 +80,7 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
 // 🔹 useApiQuery
 export const useApiQuery = <TData, TError = Error>(
   endpoint: string,
-  options?: UseQueryOptions<TData, TError>
+  options?: Omit<UseQueryOptions<TData, TError>, 'queryKey' | 'queryFn'>
 ) => {
   return useQuery<TData, TError>({
     queryKey: [endpoint],
@@ -96,7 +96,7 @@ export const useApiMutation = <
   TError = Error
 >(
   endpoint: string,
-  method: 'POST' | 'PUT' | 'DELETE' = 'POST',
+  method: 'POST' | 'PUT' | 'PATCH' | 'DELETE' = 'POST',
   options?: UseMutationOptions<TData, TError, TVariables | FormData>
 ) => {
   return useMutation<TData, TError, TVariables | FormData>({

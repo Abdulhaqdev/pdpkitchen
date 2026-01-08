@@ -1,11 +1,12 @@
 'use client';
 import OverViewLayout from '@/components/layout/overview-layot';
 import { useApiQuery } from '@/lib/api';
-import { Suspense } from 'react';
+import { Suspense, useMemo } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { FormInput } from '@/components/forms/form-input';
 import { FormSelect, type FormOption } from '@/components/forms/form-select';
 import { CardSkeleton } from '@/components/card-skeletion';
+import { format, subDays } from 'date-fns';
 
 type RangeOverviewData = {
   date_range: {
@@ -43,11 +44,19 @@ type FormData = {
 };
 
 export default function OverviewPage() {
+  const defaultDates = useMemo(
+    () => ({
+      end: format(new Date(), 'yyyy-MM-dd'),
+      start: format(subDays(new Date(), 7), 'yyyy-MM-dd')
+    }),
+    []
+  );
+
   const form = useForm<FormData>({
     defaultValues: {
       course: 2,
-      start_date: '2025-10-02',
-      end_date: '2025-10-05',
+      start_date: defaultDates.start,
+      end_date: defaultDates.end,
       student_type: 'SCHOLARSHIP'
     }
   });
